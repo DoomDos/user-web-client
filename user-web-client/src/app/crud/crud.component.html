@@ -1,0 +1,145 @@
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+
+      <!-- Table to output data -->
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>USERNAME</th>
+          <th>PERMISSION</th>
+          <th>STATUS</th>
+          <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{user.username}}</td>
+          <td>{{user.per}}</td>
+          <td>{{user.status}}</td>
+          <td>
+            <button class="btn btn-warning" (click)="updateForm(user,content)">Update</button>
+            <button class="btn btn-danger" (click)="deleteConfirm(user.id, user.username, content2)">Delete</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+      <ng-template #content let-modal>
+        <div class="modal-header">
+          <h4 class="modal-title" id="modal-basic-title" *ngIf="action == 'update'">Update User</h4>
+          <h4 class="modal-title" id="modal-basic-title" *ngIf="action == 'create'">Create User</h4>
+          <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="userForm">
+            <div class="form-group">
+              <label for="id">ID</label>
+              <input type="text" formControlName="id" class="form-control"/>
+            </div>
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input type="text" formControlName="username" class="form-control"
+                     [ngClass]="{ 'is-invalid': submitted && formField.username.errors }"/>
+              <div *ngIf="submitted && formField.username.errors" class="invalid-feedback">
+                <div *ngIf="formField.username.errors.required">Username is required</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" formControlName="password" class="form-control"
+                     [ngClass]="{ 'is-invalid': submitted && formField.password.errors }"/>
+              <div *ngIf="submitted && formField.password.errors" class="invalid-feedback">
+                <div *ngIf="formField.password.errors.required">Password is required</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-md-6">
+                <label for="per">Permission</label>
+                <input type="number" formControlName="per" class="form-control"
+                       [ngClass]="{ 'is-invalid': submitted && formField.per.errors }"/>
+                <div *ngIf="submitted && formField.per.errors" class="invalid-feedback">
+                  <div *ngIf="formField.per.errors.required">Permission is required</div>
+                </div>
+              </div>
+              <div class="form-group col-md-6">
+                <label for="status">Status</label>
+                <input type="number" formControlName="status" class="form-control"
+                       [ngClass]="{ 'is-invalid': submitted && formField.status.errors }"/>
+                <div *ngIf="submitted && formField.status.errors" class="invalid-feedback">
+                  <div *ngIf="formField.status.errors.required">Status is required</div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <button class="btn btn-primary" *ngIf="action == 'update'" (click)="updateUser()">Update</button>
+              <button class="btn btn-primary" *ngIf="action == 'create'" (click)="createUser()">Create</button>
+            </div>
+          </form>
+        </div>
+      </ng-template>
+      <button class="btn btn-success" (click)="createForm(content)">Create User</button>
+    </div>
+  </div>
+</div>
+<ng-template #content2 let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-title-delete">Deletion</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p><strong>Are you sure you want to delete <span class="text-primary" *ngIf="user">{{user.username}}</span>?</strong></p>
+    <p>All information associated to this user will be permanently deleted.
+      <span class="text-danger">This operation can not be undone.</span>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel click')">Cancel</button>
+    <button type="button" class="btn btn-danger" *ngIf="user" (click)="deleteUser(user.id)">Ok</button>
+  </div>
+</ng-template>
+<!--<div class="container">-->
+<!--  <div class="row">-->
+<!--    <div class="col-xs-12">-->
+<!--      <h3>Create User</h3>-->
+<!--      <form [formGroup]="userForm">-->
+<!--          <div class="form-group">-->
+<!--            <label for="username">Username</label>-->
+<!--            <input type="text" formControlName="username" class="form-control" [ngClass]="{ 'is-invalid': submitted && formField.username.errors }" />-->
+<!--            <div *ngIf="submitted && formField.username.errors" class="invalid-feedback">-->
+<!--              <div *ngIf="formField.username.errors.required">Username is required</div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="form-group">-->
+<!--            <label for="password">Password</label>-->
+<!--            <input type="password" formControlName="password" class="form-control" [ngClass]="{ 'is-invalid': submitted && formField.password.errors }" />-->
+<!--            <div *ngIf="submitted && formField.password.errors" class="invalid-feedback">-->
+<!--              <div *ngIf="formField.password.errors.required">Password is required</div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        <div class="row">-->
+<!--          <div class="form-group col-md-6">-->
+<!--            <label for="per">Permission</label>-->
+<!--            <input type="number" formControlName="per" class="form-control" [ngClass]="{ 'is-invalid': submitted && formField.per.errors }" />-->
+<!--            <div *ngIf="submitted && formField.per.errors" class="invalid-feedback">-->
+<!--              <div *ngIf="formField.per.errors.required">Permission is required</div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="form-group col-md-6">-->
+<!--            <label for="status">Status</label>-->
+<!--            <input type="number" formControlName="status" class="form-control" [ngClass]="{ 'is-invalid': submitted && formField.status.errors }" />-->
+<!--            <div *ngIf="submitted && formField.status.errors" class="invalid-feedback">-->
+<!--              <div *ngIf="formField.status.errors.required">Status is required</div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="form-group">-->
+<!--          <button class="btn btn-primary" (click)="createUser()">Create</button>-->
+<!--        </div>-->
+<!--      </form>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->

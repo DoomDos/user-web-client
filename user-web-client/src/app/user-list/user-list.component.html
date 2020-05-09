@@ -1,0 +1,26 @@
+<!--The whole content below can be removed with the new code.-->
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+
+      <!-- Table to output data -->
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>USERNAME</th>
+          <th>PERMISSION</th>
+          <th>STATUS</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{user.username}}</td>
+          <td>{{user.per}}</td>
+          <td>{{user.status}}</td>
+        </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>
