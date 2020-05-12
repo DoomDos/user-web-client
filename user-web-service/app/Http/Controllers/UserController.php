@@ -38,12 +38,6 @@ class UserController extends Controller
         if ($this->userRepo->checkUser($request->username)){
             return response()->json('Username has been taken', 200);
         }
-        $data = [
-            'username' => $request->username,
-            'password' => $request->password,
-            'per'      => $request->per,
-            'status'   => $request->status
-        ];
         if ($this->userRepo->create($request->username, $request->password, $request->per, $request->status)) {
             return response()->json('Created', 201);
         } else{
