@@ -32,9 +32,11 @@ class UserController extends Controller
             'per'      => 'required',
             'status'   => 'required'
         ]);
-
+        if ($request->currentPer >= 3 || ($request->currentPer != 1 && $request->currentPer >= $request->per)) {
+            return response()->json('Permission\'s forbidden', 200);
+        }
         if ($this->userRepo->checkUser($request->username)){
-            return response()->json('Username has been taken', 400);
+            return response()->json('Username has been taken', 200);
         }
         $data = [
             'username' => $request->username,

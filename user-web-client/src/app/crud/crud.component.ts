@@ -3,7 +3,6 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {HomeService} from "../services/home.service";
 import {NgbModal, ModalDismissReasons} from "@ng-bootstrap/ng-bootstrap";
 import {AuthService} from "../services/auth.service";
-import {of} from "rxjs";
 
 @Component({
   selector: 'app-crud',
@@ -98,7 +97,7 @@ export class CrudComponent implements OnInit {
     if (this.userForm.invalid) {
       return;
     }
-    this.homeService.createUser(this.formField.username.value, this.formField.password.value, this.formField.per.value, this.formField.status.value).subscribe(value => {
+    this.homeService.createUser(this.currentPer, this.formField.username.value, this.formField.password.value, this.formField.per.value, this.formField.status.value).subscribe(value => {
       console.log(value);
       this.action = '';
       this.getUsers();
@@ -152,7 +151,7 @@ export class CrudComponent implements OnInit {
   }
 
   deleteUser(id: number, per: number) {
-    if (this.currentPer == per ) {
+    if (this.currentPer == per && this.currentPer != 1) {
       this.modalService.dismissAll();
       return;
     }

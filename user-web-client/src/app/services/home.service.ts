@@ -22,8 +22,8 @@ export class HomeService {
     return this.http.get(this.baseServer+'/users');
   }
 
-  createUser(username: string, password: string, per: number, status: number){
-    return this.http.post(this.baseServer+'/users', { username: username, password: password, per: per, status: status });
+  createUser(currentPer:number, username: string, password: string, per: number, status: number){
+    return this.http.post(this.baseServer+'/users', { currentPer: currentPer, username: username, password: password, per: per, status: status });
 
   }
 
