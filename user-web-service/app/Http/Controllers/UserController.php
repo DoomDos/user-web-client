@@ -4,19 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\User as UserResource;
 use App\Http\Resources\UserCollection;
-use App\User;
+use App\Repositories\RepositoryInterface;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
-    public function index() {
-        return new UserCollection(User::all());
+    protected $userRepo;
+    public function __construct(RepositoryInterface $userRepo)
+    {
+        $this->userRepo = $userRepo;
     }
 
-    public function show($id) {
-        return new UserResource(User::findOrFail($id));
+    public function index() {
+        return new UserCollection($this->userRepo->getAll());
     }
+
+    public function show(Request $request) {
+        return new UserResource($this->userRepo->find($request->id));
+    }
+
     public function store(Request $request)
     {
 
@@ -26,7 +32,17 @@ class UserController extends Controller
             'per'      => 'required',
             'status'   => 'required'
         ]);
-        if (User::addUser($request->username, $request->password, $request->per, $request->status)) {
+
+        if ($this->userRepo->checkUser($request->username)){
+            return response()->json('Username has been taken', 400);
+        }
+        $data = [
+            'username' => $request->username,
+            'password' => $request->password,
+            'per'      => $request->per,
+            'status'   => $request->status
+        ];
+        if ($this->userRepo->create($request->username, $request->password, $request->per, $request->status)) {
             return response()->json('Created', 201);
         } else{
             return response()->json($request, 400);
@@ -40,17 +56,26 @@ class UserController extends Controller
             'per'      => 'required',
             'status'   => 'required'
         ]);
-        if (User::updateUser($request->id, $request->username, $request->password, $request->per, $request->status)) {
+        $tmpId = $this->userRepo->getIdByUsername($request->username);
+        if ($tmpId != null && $tmpId != $request->id) {
+            return response()->json('Username has been taken', 200);
+        }
+        if ($this->userRepo->getPer($request->currentId) != 1 && $this->userRepo->getPer($request->id) != $request->per) {
+            return response()->json('Permission\'s forbidden', 200);
+        }
+        if ($this->userRepo->update($request->id, $request->username, $request->password, $request->per, $request->status)) {
             return response()->json('Updated', 200);
         } else{
             return response()->json($request, 400);
         }
     }
-    public function delete($id)
+    public function delete(Request $request)
     {
-        $user = User::findOrFail($id);
-        $user->delete();
-
-        return response()->json(null, 204);
+        $result = $this->userRepo->delete($request->id);
+        if ($result) {
+            return response()->json('User\'s deleted', 204);
+        } else {
+            return response()->json('Somgthing\'s wrong', 200);
+        }
     }
 }

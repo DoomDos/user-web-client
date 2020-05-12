@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {Router} from "@angular/router";
 import {ModalDismissReasons, NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {AuthService} from "../services/auth.service";
 
 @Component({
   selector: 'app-home',
@@ -8,9 +9,10 @@ import {ModalDismissReasons, NgbModal} from "@ng-bootstrap/ng-bootstrap";
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-  users: any = [];
+
   private closeResult: string;
   constructor(
+    private authService: AuthService,
     private router: Router,
     private modalService: NgbModal
   ) {

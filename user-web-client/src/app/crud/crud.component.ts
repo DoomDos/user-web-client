@@ -1,7 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {HomeService} from "../services/home.service";
-import { NgbModal, ModalDismissReasons } from "@ng-bootstrap/ng-bootstrap";
+import {NgbModal, ModalDismissReasons} from "@ng-bootstrap/ng-bootstrap";
+import {AuthService} from "../services/auth.service";
+import {of} from "rxjs";
 
 @Component({
   selector: 'app-crud',
@@ -16,8 +18,11 @@ export class CrudComponent implements OnInit {
   submitted = false;
   closeResult = '';
   action = '';
+  currentUser = parseInt(localStorage.getItem('currentUser'));
+  currentPer = parseInt(localStorage.getItem('currentPer'));
 
   constructor(
+    private authService: AuthService,
     private homeService: HomeService,
     private modalService: NgbModal) {
     this.getUsers();
@@ -25,14 +30,7 @@ export class CrudComponent implements OnInit {
 
   ngOnInit() {
 
-    // this.userFormUpdate = new FormGroup({
-    //     'id': new FormControl(null,),
-    //     'username': new FormControl(null, [Validators.required]),
-    //     'password': new FormControl(null, [Validators.required]),
-    //     'per': new FormControl(null, [Validators.required]),
-    //     'status': new FormControl(null, [Validators.required]),
-    //   }
-    // );
+
     this.userForm = new FormGroup({
         'id': new FormControl(null,),
         'username': new FormControl(null, [Validators.required]),
@@ -65,22 +63,22 @@ export class CrudComponent implements OnInit {
 
   getUsers() {
     return this.homeService.getUsers().subscribe(value => {
-      this.users = value['data']
-    })
+      this.users = [];
+      for (let tmp of value['data']){
+        if (parseInt(tmp.per) >= this.currentPer){
+          this.users.push(tmp);
+        }
+      }
+    });
   }
 
   get formField() {
     return this.userForm.controls;
   }
 
-  // showUser(id) {
-  //   console.log('Get User ' + id);
-  //   return this.http.get(this.baseServer + '/' + id).subscribe(user => {
-  //     this.user = user['data'];
-  //   });
-  // }
 
-  createForm(content){
+
+  createForm(content) {
     this.action = 'create';
     this.userForm.get('id').setValue(null);
     this.userForm.get('username').setValue(null);
@@ -93,6 +91,7 @@ export class CrudComponent implements OnInit {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
     });
   }
+
   createUser() {
     this.submitted = true;
 
@@ -122,14 +121,17 @@ export class CrudComponent implements OnInit {
     });
   }
 
-  updateUser(){
+  updateUser() {
     this.submitted = true;
 
     if (this.userForm.invalid) {
       return;
     }
-    console.log(this.formField.id.value);
-    this.homeService.updateUser(this.formField.id.value, this.formField.username.value, this.formField.password.value, this.formField.per.value, this.formField.status.value).subscribe(value => {
+    if (this.currentPer >= 3 && localStorage.getItem('currentUser') != this.formField.id.value){
+      console.log("Forbidden");
+      return;
+    }
+    this.homeService.updateUser(this.currentUser, this.formField.id.value, this.formField.username.value, this.formField.password.value, this.formField.per.value, this.formField.status.value).subscribe(value => {
       console.log(value);
       this.getUsers();
     })
@@ -138,9 +140,10 @@ export class CrudComponent implements OnInit {
     this.modalService.dismissAll();
   }
 
-  deleteConfirm(id, username, content) {
+  deleteConfirm(id, username, per, content) {
     this.user.id = id;
     this.user.username = username;
+    this.user.per = per;
     this.modalService.open(content, {ariaLabelledBy: 'modal-title-delete'}).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
@@ -148,7 +151,19 @@ export class CrudComponent implements OnInit {
     });
   }
 
-  deleteUser(id: number) {
+  deleteUser(id: number, per: number) {
+    if (this.currentPer == per ) {
+      this.modalService.dismissAll();
+      return;
+    }
+    if (this.currentPer >= 3){
+      this.modalService.dismissAll();
+      return;
+    }
+    if (this.currentPer <= 2 && this.currentUser == id){
+      this.modalService.dismissAll();
+      return;
+    }
     this.homeService.deleteUser(id).subscribe(value => {
       this.getUsers();
     });

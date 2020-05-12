@@ -12,7 +12,7 @@ import { AlertComponent } from './auth/alert/alert.component';
 import { CrudComponent } from './crud/crud.component';
 import { CreateComponent } from './crud/create/create.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
+import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { UserListComponent } from './user-list/user-list.component';
 
 

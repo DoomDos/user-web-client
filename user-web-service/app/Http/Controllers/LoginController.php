@@ -2,29 +2,42 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
 use Illuminate\Http\Request;
+use App\Repositories\RepositoryInterface;
 
 class LoginController extends Controller
 {
 
-    public function login(Request $request)
+    protected $repos;
+    public function __construct(RepositoryInterface $repos)
     {
-        if (User::checkUser($request->username)) {
-            if (User::checkPassword($request->username,$request->password)) {
+        $this->repos = $repos;
+    }
+
+    public function login(Request $request) {
+        if ($this->repos->checkUser($request->username)) {
+            $tmpId = $this->repos->getIdByUsername($request->username);
+            if ($this->repos->checkPassword($tmpId, $request->password)) {
 
                 $data = [
-                        'id'         => User::getIdByUsername($request->username)->id,
+                        'id'         => $tmpId,
                         'username'   => $request->username,
-                        'permission' => User::getPermission($request->username)->per,
-                        'token'      => 'fake token'
+                        'permission' => $this->repos->getPer($tmpId)
                 ];
-                return response()->json($data, 200);
+                return $this->respondWithToken($data);
             }
             else
-                return response()->json('',401);
+                return response()->json('Check Username or Password',200);
         } else {
-            return response()->json('',401);
+            return response()->json('Check Username or Password',200);
         }
+    }
+
+    protected function respondWithToken($token) {
+        return response()->json([
+            'access_token' => $token,
+            'token_type'   => 'bearer',
+            'expires_in'   => auth()->factory()->getTTL() * 60
+        ], 200);
     }
 }

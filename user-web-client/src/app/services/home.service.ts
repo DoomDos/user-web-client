@@ -27,8 +27,8 @@ export class HomeService {
 
   }
 
-  updateUser(id:number, username: string, password: string, per: number, status: number){
-    return this.http.post(this.baseServer+'/updateuser', { id: id, username: username, password: password, per: per, status: status });
+  updateUser(currentId:number, id:number, username: string, password: string, per: number, status: number){
+    return this.http.post(this.baseServer+'/updateuser', {currentId: currentId, id: id, username: username, password: password, per: per, status: status });
 
   }
 

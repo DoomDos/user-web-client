@@ -16,7 +16,8 @@ export class AuthService {
         // login successful if there's a jwt token in the response
         if (user) {
           // store user details and jwt token in local storage to keep user logged in between page refreshes
-          localStorage.setItem('currentUser', JSON.stringify(user));
+          localStorage.setItem('currentUser', user['access_token'].id);
+          localStorage.setItem('currentPer', user['access_token'].permission);
         }
 
         return user;
@@ -25,5 +26,6 @@ export class AuthService {
   logout() {
     // remove user from local storage to log user out
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('currentPer');
   }
 }

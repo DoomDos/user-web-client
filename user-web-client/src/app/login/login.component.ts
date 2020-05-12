@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
-import {first} from "rxjs/operators";
 import {ActivatedRoute, Router, Routes} from "@angular/router";
 import {AuthService} from "../services/auth.service";
 import {AlertService} from "../services/alert.service";
@@ -15,6 +14,7 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   submitted = false;
   returnUrl: string;
+  error = false;
 
   constructor(
     private router: Router,
@@ -54,18 +54,12 @@ export class LoginComponent implements OnInit {
           this.router.navigate(['/dashboard/user-list']);
         },
         (error) => {
-          this.alertService.error(error);
-          console.log(this.alertService.error(error));
+          this.error = true;
         }
       );
-    // this.authService.login(this.formField.username.value, this.formField.password.value)
-    //   .pipe(first())
-    //   .subscribe(
-    //     data => {
-    //       this.router.navigate([this.returnUrl]);
-    //     },
-    //     error => {
-    //       this.alertService.error(error);
-    //     });
+
+  }
+  closeAlert() {
+    this.error = false;
   }
 }
